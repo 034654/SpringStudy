@@ -6,7 +6,7 @@
 	version="2.4">
 	<display-name>Gupao Web Application</display-name>
 	<servlet>
-		<servlet-name>gpmvc</servlet-name>
+		<servlet-name>mrmvc</servlet-name>
 		<servlet-class>com.mrlv.mvcframework.v2.servlet.MrDispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
@@ -16,7 +16,7 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>gpmvc</servlet-name>
+		<servlet-name>mrmvc</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 </web-app>

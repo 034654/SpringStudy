@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-
-
-//虽然，用法一样，但是没有功能
 @MrController
 @MrRequestMapping("/demo")
 public class DemoAction {

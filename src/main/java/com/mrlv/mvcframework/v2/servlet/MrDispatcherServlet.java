@@ -7,19 +7,26 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.*;
 
 /**
- * Created by Tom.
+ * Created by mrLv
  */
 public class MrDispatcherServlet extends HttpServlet{
 
-    //保存application.properties配置文件中的内容
+    /**
+     * 保存application.properties配置文件中的内容
+     * */
     private Properties contextConfig = new Properties();
 
-    //保存扫描的所有的类名
+    /**
+     * 保存扫描的所有的类名
+     * */
     private List<String> classNames = new ArrayList<String>();
 
     //传说中的IOC容器，我们来揭开它的神秘面纱
@@ -51,23 +58,25 @@ public class MrDispatcherServlet extends HttpServlet{
     }
 
 
-    //初始化阶段
+    /**
+     *初始化阶段
+     * */
     @Override
     public void init(ServletConfig config) throws ServletException {
 
-        //1、加载配置文件
+        //加载配置文件
         doLoadConfig(config.getInitParameter("contextConfigLocation"));
 
-        //2、扫描相关的类
+        //扫描相关的类
         doScanner(contextConfig.getProperty("scanPackage"));
         
-        //3、初始化扫描到的类，并且将它们放入到ICO容器之中
+        //初始化扫描到的类，并且将它们放入到ICO容器之中
         doInstance();
         
-        //4、完成依赖注入
+        //完成依赖注入
         doAutowired();
 
-        //5、初始化HandlerMapping
+        //初始化HandlerMapping
         initHandlerMapping();
 
         System.out.println("GP Spring framework is init.");
@@ -75,30 +84,65 @@ public class MrDispatcherServlet extends HttpServlet{
     }
 
 
-    //初始化url和Method的一对一对应关系
+
     private void initHandlerMapping() {
 
     }
 
-    //自动依赖注入
+
     private void doAutowired() {
 
 
     }
 
+    /**
+     * 初始化扫描到的类，并且将它们放入到ICO容器之中
+     * */
     private void doInstance() {
-
+        
     }
 
 
-    //扫描出相关的类
+    /**
+    * 扫描出相关的类
+    * */
     private void doScanner(String scanPackage) {
-
+        //scanPackage中存储的是包路径，将包路径转换为文件路径
+        URL url = this.getClass().getClassLoader().getResource("/." + scanPackage.replaceAll("\\.","/"));
+        File classPath = new File(url.getFile());
+        for (File file : classPath.listFiles()) {
+            if(file.isDirectory()){
+                doScanner(scanPackage + "." + file.getName());
+            }else{
+                if(!file.getName().endsWith(".class")){
+                    continue;
+                }
+                String className = (scanPackage + "." + file.getName().replace(".class",""));
+                classNames.add(className);
+            }
+        }
     }
 
 
-    //加载配置文件
+    /**
+     * 加载配置文件
+     * */
     private void doLoadConfig(String contextConfigLocation) {
+        //从类路径下找到Spring的主配置文件所在的路径，将其取出存放到properties对象中
+        InputStream fis = this.getClass().getClassLoader().getResourceAsStream(contextConfigLocation);
+        try {
+            contextConfig.load(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if (null == fis){
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
     }
 }
